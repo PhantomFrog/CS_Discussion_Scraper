@@ -8,13 +8,13 @@ import csv
 from autoscraper import AutoScraper
 
 # URL of the Steam group, must be discussions page
-base_url = 'steamcommunity.com/examplegroup/discussions'
+base_url = 'https://steamcommunity.com/groups/Example/discussions'
 
 # General keywords to search for
-general_keywords = []
+general_keywords = ["Knife"]
 
 # Number of pages to scrape
-num_pages = 100
+num_pages = 50
 
 # Loading animation
 done = False
@@ -43,6 +43,7 @@ wanted_list = general_keywords
 scraper.build(base_url, wanted_list=wanted_list)
 
 filtered_topics = []
+seen_urls = set()
 
 for page in range(1, num_pages + 1):
     current_page = page
@@ -63,12 +64,14 @@ for page in range(1, num_pages + 1):
     # Filter topics containing any of the general keywords in the post content
     for topic in topics:
         post_url = topic.find('a', class_='forum_topic_overlay')['href']
-        post_response = requests.get(post_url)
-        post_soup = BeautifulSoup(post_response.text, 'html.parser')
-        post_content = post_soup.find('div', class_='forum_op').text.lower()
-        found_keywords = [keyword for keyword in general_keywords if keyword.lower() in post_content]
-        if found_keywords:
-            filtered_topics.append((post_url, ', '.join(found_keywords)))
+        if post_url not in seen_urls:
+            post_response = requests.get(post_url)
+            post_soup = BeautifulSoup(post_response.text, 'html.parser')
+            post_content = post_soup.find('div', class_='forum_op').text.lower()
+            found_keywords = [keyword for keyword in general_keywords if keyword.lower() in post_content]
+            if found_keywords:
+                filtered_topics.append((post_url, ', '.join(found_keywords)))
+                seen_urls.add(post_url)
 
 # Stop the loading animation
 done = True
@@ -80,6 +83,4 @@ with open('filtered_topics.csv', 'w', newline='', encoding='utf-8') as csvfile:
     writer.writerow(['URL', 'Keywords Found'])
     for topic in filtered_topics:
         writer.writerow(topic)
-
-
 
