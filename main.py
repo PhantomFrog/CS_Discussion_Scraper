@@ -7,14 +7,14 @@ import sys
 import csv
 from autoscraper import AutoScraper
 
-# URL of the Steam group
-base_url = 'https://steamcommunity.com/groups/csgo-ts/discussions'
+# URL of the Steam group, must be discussions page
+base_url = 'steamcommunity.com/examplegroup/discussions'
 
 # General keywords to search for
-general_keywords = ["AWP", "Neo-Noir"]
+general_keywords = []
 
 # Number of pages to scrape
-num_pages = 5
+num_pages = 100
 
 # Loading animation
 done = False
